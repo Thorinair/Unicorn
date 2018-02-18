@@ -21,10 +21,6 @@
 #define PIN_LED       13
 #define PIN_BATTERY   A0
 
-/* Battery Voltage Levels */
-#define BATTERY_V_MIN 3.2
-#define BATTERY_V_MAX 4.2
-
 /* Flash Types */
 #define FLASH_TYPE_WAKE 0
 #define FLASH_TYPE_DONE 1
@@ -272,7 +268,12 @@ void flashStatusLED(int type) {
 void processSensors() {
     float temp = SHT21.getTemperature();
     float humi = SHT21.getHumidity();
-    float batt = ((((float)analogRead(PIN_BATTERY) / 1024) * 5 - BATTERY_V_MIN) / (BATTERY_V_MAX - BATTERY_V_MIN)) * 100; 
+    float batt;
+    if (BATTERY_VOLTAGE)
+        batt = ((float)analogRead(PIN_BATTERY) / 1024) * BATTERY_MULTIPLIER; 
+    else
+        batt = ((((float)analogRead(PIN_BATTERY) / 1024) * BATTERY_MULTIPLIER - BATTERY_V_MIN) / (BATTERY_V_MAX - BATTERY_V_MIN)) * 100; 
+    
     
     if (batt < 0)
         batt = 0;

@@ -94,3 +94,23 @@
 
 /* Brightness of the status LED while during a flash. Can range from 0 to 1024. */
 #define LED_STATUS_FLASH_BRIGHTNESS 250
+
+
+
+/********
+ * Battery Status
+ *******/
+
+/* Use voltage instead of percentage. */
+#define BATTERY_VOLTAGE false
+
+/* Voltage conversion multiplier. Should be adjusted so that the reported voltage is same as measured on battery. 
+ * You will need to enable battery voltage above to tune this.
+ * Use the following formula:  NewMulti = Old Multi * (MeasuredVoltage / ReportedVoltage) */
+#define BATTERY_MULTIPLIER 5.622
+ 
+/* Battery voltage when empty. */
+#define BATTERY_V_MIN 3.2
+
+/* Battery voltage when full. */
+#define BATTERY_V_MAX 4.2
