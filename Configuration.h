@@ -106,7 +106,7 @@
 
 /* Voltage conversion multiplier. Should be adjusted so that the reported voltage is same as measured on battery. 
  * You will need to enable battery voltage above to tune this.
- * Use the following formula:  NewMulti = Old Multi * (MeasuredVoltage / ReportedVoltage) */
+ * Use the following formula:  NewMultiplier = OldMultiplier * (MeasuredVoltage / ReportedVoltage) */
 #define BATTERY_MULTIPLIER 5.622
  
 /* Battery voltage when empty. */
