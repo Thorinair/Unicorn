@@ -84,7 +84,7 @@
  *******/
 
 /* Status LED. This LED flashes to indicate the status of the device. Single short flash indicates that the device has woken up. 
- * Afterwards, three short flashes indicate successful upload of data, while one long flash indicates failure. 
+ * Afterwards, flashes indicate the result of uploading the data. A short flash indicates a success, while a long flash indicates failure. 
  * Additionally, the LED mey glow passively to indicate that the device is on. */
 #define LED_STATUS_ENABLE true
 

@@ -1,7 +1,7 @@
 /*
  * Unicorn
  *   Author:      Thorinair
- *   Version:     v1.0.0
+ *   Version:     v1.1.0
  *   Description: A high precision wireless thermometer and humidity meter.
  *   
  *   This is the main source code file. All configuration is to be done inside the Configuration.h file.
@@ -244,20 +244,14 @@ void flashStatusLED(int type) {
         else if (type == FLASH_TYPE_DONE) {
             analogWrite(PIN_LED, PWMRANGE - LED_STATUS_FLASH_BRIGHTNESS);   
             delay(FLASH_TIME_SHORT);              
-            analogWrite(PIN_LED, PWMRANGE - LED_STATUS_IDLE_BRIGHTNESS); 
-            delay(FLASH_TIME_PAUSE); 
-            analogWrite(PIN_LED, PWMRANGE - LED_STATUS_FLASH_BRIGHTNESS);       
-            delay(FLASH_TIME_SHORT);         
             analogWrite(PIN_LED, PWMRANGE - LED_STATUS_IDLE_BRIGHTNESS);  
-            delay(FLASH_TIME_PAUSE);   
-            analogWrite(PIN_LED, PWMRANGE - LED_STATUS_FLASH_BRIGHTNESS);       
-            delay(FLASH_TIME_SHORT);         
-            analogWrite(PIN_LED, PWMRANGE - LED_STATUS_IDLE_BRIGHTNESS);  
+            delay(FLASH_TIME_SHORT);       
         }
         else if (type == FLASH_TYPE_FAIL) {
             analogWrite(PIN_LED, PWMRANGE - LED_STATUS_FLASH_BRIGHTNESS);   
             delay(FLASH_TIME_LONG);              
             analogWrite(PIN_LED, PWMRANGE - LED_STATUS_IDLE_BRIGHTNESS);  
+            delay(FLASH_TIME_SHORT);       
         }
     }
 }
@@ -266,40 +260,51 @@ void flashStatusLED(int type) {
 
 /* Processing Functions */
 void processSensors() {
-    float temp = SHT21.getTemperature();
-    float humi = SHT21.getHumidity();
-    float batt;
-    if (BATTERY_VOLTAGE)
-        batt = ((float)analogRead(PIN_BATTERY) / 1024) * BATTERY_MULTIPLIER; 
-    else
-        batt = ((((float)analogRead(PIN_BATTERY) / 1024) * BATTERY_MULTIPLIER - BATTERY_V_MIN) / (BATTERY_V_MAX - BATTERY_V_MIN)) * 100; 
+    int result;
+
+    #ifdef VARIPASS_ID_TEMPERATURE    
+        float temp = SHT21.getTemperature();
+        
+        varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_TEMPERATURE, temp, &result);
+        
+        if (result == VARIPASS_RESULT_SUCCESS)
+            flashStatusLED(FLASH_TYPE_DONE);
+        else
+            flashStatusLED(FLASH_TYPE_FAIL);            
+    #endif
     
+    #ifdef VARIPASS_ID_HUMIDITY
+        float humi = SHT21.getHumidity();
     
-    if (batt < 0)
-        batt = 0;
-    else if (batt > 100)
-        batt = 100;
+        varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_HUMIDITY,    humi, &result);
+        
+        if (result == VARIPASS_RESULT_SUCCESS)
+            flashStatusLED(FLASH_TYPE_DONE);
+        else
+            flashStatusLED(FLASH_TYPE_FAIL);
+    #endif
+    
+    #ifdef VARIPASS_ID_BATTERY
+        float batt;
+        if (BATTERY_VOLTAGE)
+            batt = ((float)analogRead(PIN_BATTERY) / 1024) * BATTERY_MULTIPLIER; 
+        else
+            batt = ((((float)analogRead(PIN_BATTERY) / 1024) * BATTERY_MULTIPLIER - BATTERY_V_MIN) / (BATTERY_V_MAX - BATTERY_V_MIN)) * 100; 
+        
+        if (batt < 0)
+            batt = 0;
+        else if (batt > 100)
+            batt = 100;
+            
+        varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_BATTERY,     batt, &result);
+        
+        if (result == VARIPASS_RESULT_SUCCESS)
+            flashStatusLED(FLASH_TYPE_DONE);
+        else
+            flashStatusLED(FLASH_TYPE_FAIL);
+    #endif
     
     //Serial.println(String(batt) + " V Battery, " + String(temp) + "°C, " + String(humi) + "% Humidity");
-
-    int resultTemp = VARIPASS_RESULT_SUCCESS;
-    int resultHumi = VARIPASS_RESULT_SUCCESS;
-    int resultBatt = VARIPASS_RESULT_SUCCESS;
-
-    #ifdef VARIPASS_ID_TEMPERATURE
-        varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_TEMPERATURE, temp, &resultTemp);
-    #endif
-    #ifdef VARIPASS_ID_HUMIDITY
-        varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_HUMIDITY,    humi, &resultHumi);
-    #endif
-    #ifdef VARIPASS_ID_BATTERY
-        varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_BATTERY,     batt, &resultBatt);
-    #endif
-
-    if (resultTemp == VARIPASS_RESULT_SUCCESS && resultHumi == VARIPASS_RESULT_SUCCESS && resultBatt == VARIPASS_RESULT_SUCCESS)
-        flashStatusLED(FLASH_TYPE_DONE);
-    else
-        flashStatusLED(FLASH_TYPE_FAIL);
 }
 
 
