@@ -1,7 +1,7 @@
 /*
  * Unicorn
  *   Author:      Thorinair
- *   Version:     v1.1.0
+ *   Version:     v1.2.0
  *   Description: A high precision wireless thermometer and humidity meter.
  *   
  *   This is the main source code file. All configuration is to be done inside the Configuration.h file.
@@ -55,7 +55,7 @@ IPAddress getIPFromString(char* addressString, int id);
 void setupLED();
 void setupSensor();
 void setupSettings();
-void setupWiFi();
+int setupWiFi();
 
 /* Utility Functions */
 int connectWiFi(char* ssid, char* pass, char* conf);
@@ -70,6 +70,7 @@ void processSensors();
 SHT21 SHT21;
 int prevWiFi;
 int currWiFi;
+int wifiConnected;
 
 
 
@@ -132,11 +133,12 @@ void setupSettings() {
     }
 }
 
-void setupWiFi() {
+int setupWiFi() {
     WiFi.mode(WIFI_STA);
     WiFi.hostname(WIFI_HOST);
 
     int result;
+    int counter = 0;
 
     do {
         result = 0;
@@ -182,11 +184,16 @@ void setupWiFi() {
                 #endif   
                 break;
         }
+        
+        if (counter >= 7)
+            return WIFI_RESULT_FAIL;
+            
         if (result == WIFI_RESULT_FAIL) {
             //Serial.println("\nWiFi " + String(currWiFi) + " failed..." );
             currWiFi++;
             if (currWiFi >= 8)
                 currWiFi = 0;
+            counter++;
         }
     } while (result == WIFI_RESULT_FAIL);        
     //Serial.println("\nWiFi " + String(currWiFi) + " connected!" );
@@ -199,6 +206,8 @@ void setupWiFi() {
         EEPROM.write(EEPROM_WIFI,  prevWiFi);  
         EEPROM.end();
     }
+
+    return WIFI_RESULT_DONE;
 }
 
 
@@ -260,51 +269,53 @@ void flashStatusLED(int type) {
 
 /* Processing Functions */
 void processSensors() {
-    int result;
-
-    #ifdef VARIPASS_ID_TEMPERATURE    
-        float temp = SHT21.getTemperature();
-        
-        varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_TEMPERATURE, temp, &result);
-        
-        if (result == VARIPASS_RESULT_SUCCESS)
-            flashStatusLED(FLASH_TYPE_DONE);
-        else
-            flashStatusLED(FLASH_TYPE_FAIL);            
-    #endif
+    if (wifiConnected == WIFI_RESULT_DONE) {    
+        int result;
     
-    #ifdef VARIPASS_ID_HUMIDITY
-        float humi = SHT21.getHumidity();
-    
-        varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_HUMIDITY,    humi, &result);
-        
-        if (result == VARIPASS_RESULT_SUCCESS)
-            flashStatusLED(FLASH_TYPE_DONE);
-        else
-            flashStatusLED(FLASH_TYPE_FAIL);
-    #endif
-    
-    #ifdef VARIPASS_ID_BATTERY
-        float batt;
-        if (BATTERY_VOLTAGE)
-            batt = ((float)analogRead(PIN_BATTERY) / 1024) * BATTERY_MULTIPLIER; 
-        else
-            batt = ((((float)analogRead(PIN_BATTERY) / 1024) * BATTERY_MULTIPLIER - BATTERY_V_MIN) / (BATTERY_V_MAX - BATTERY_V_MIN)) * 100; 
-        
-        if (batt < 0)
-            batt = 0;
-        else if (batt > 100)
-            batt = 100;
+        #ifdef VARIPASS_ID_TEMPERATURE    
+            float temp = SHT21.getTemperature();
             
-        varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_BATTERY,     batt, &result);
+            varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_TEMPERATURE, temp, &result);
+            
+            if (result == VARIPASS_RESULT_SUCCESS)
+                flashStatusLED(FLASH_TYPE_DONE);
+            else
+                flashStatusLED(FLASH_TYPE_FAIL);            
+        #endif
         
-        if (result == VARIPASS_RESULT_SUCCESS)
-            flashStatusLED(FLASH_TYPE_DONE);
-        else
-            flashStatusLED(FLASH_TYPE_FAIL);
-    #endif
-    
-    //Serial.println(String(batt) + " V Battery, " + String(temp) + "°C, " + String(humi) + "% Humidity");
+        #ifdef VARIPASS_ID_HUMIDITY
+            float humi = SHT21.getHumidity();
+        
+            varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_HUMIDITY,    humi, &result);
+            
+            if (result == VARIPASS_RESULT_SUCCESS)
+                flashStatusLED(FLASH_TYPE_DONE);
+            else
+                flashStatusLED(FLASH_TYPE_FAIL);
+        #endif
+        
+        #ifdef VARIPASS_ID_BATTERY
+            float batt;
+            if (BATTERY_VOLTAGE)
+                batt = ((float)analogRead(PIN_BATTERY) / 1024) * BATTERY_MULTIPLIER; 
+            else
+                batt = ((((float)analogRead(PIN_BATTERY) / 1024) * BATTERY_MULTIPLIER - BATTERY_V_MIN) / (BATTERY_V_MAX - BATTERY_V_MIN)) * 100; 
+            
+            if (batt < 0)
+                batt = 0;
+            else if (batt > 100)
+                batt = 100;
+                
+            varipassWriteFloat(VARIPASS_KEY, VARIPASS_ID_BATTERY,     batt, &result);
+            
+            if (result == VARIPASS_RESULT_SUCCESS)
+                flashStatusLED(FLASH_TYPE_DONE);
+            else
+                flashStatusLED(FLASH_TYPE_FAIL);
+        #endif
+        
+        //Serial.println(String(batt) + " V Battery, " + String(temp) + "°C, " + String(humi) + "% Humidity");
+    }
 }
 
 
@@ -318,10 +329,10 @@ void setup() {
     Serial.begin(9600);
     setupSensor();
     setupSettings();
-    setupWiFi();
+    wifiConnected = setupWiFi();
 
     processSensors();
-
+    
     if (DEEP_SLEEP) {
         ESP.deepSleep(MEASURE_INTERVAL * 1000000);
     }
