@@ -1,7 +1,7 @@
 /*
  * Unicorn
  *   Author:      Thorinair
- *   Version:     v1.2.0
+ *   Version:     v1.3.0
  *   Description: A high precision wireless thermometer and humidity meter.
  *   
  *   This is the main source code file. All configuration is to be done inside the Configuration.h file.
@@ -58,7 +58,7 @@ void setupSettings();
 int setupWiFi();
 
 /* Utility Functions */
-int connectWiFi(char* ssid, char* pass, char* conf);
+int connectWiFi(char* ssid, char* pass, char* conf, bool isOpen);
 void flashStatusLED(int type);
 
 /* Processing Functions */
@@ -145,42 +145,42 @@ int setupWiFi() {
         switch (currWiFi) {
             case 0:  
                 #ifdef WIFI_0_SSID         
-                    result = connectWiFi(WIFI_0_SSID, WIFI_0_PASS, WIFI_0_CONF);
+                    result = connectWiFi(WIFI_0_SSID, WIFI_0_PASS, WIFI_0_CONF, WIFI_0_OPEN);
                 #endif  
                 break;  
             case 1:  
                 #ifdef WIFI_1_SSID         
-                    result = connectWiFi(WIFI_1_SSID, WIFI_1_PASS, WIFI_1_CONF);
+                    result = connectWiFi(WIFI_1_SSID, WIFI_1_PASS, WIFI_1_CONF, WIFI_1_OPEN);
                 #endif  
                 break;   
             case 2:  
                 #ifdef WIFI_2_SSID         
-                    result = connectWiFi(WIFI_2_SSID, WIFI_2_PASS, WIFI_2_CONF);
+                    result = connectWiFi(WIFI_2_SSID, WIFI_2_PASS, WIFI_2_CONF, WIFI_2_OPEN);
                 #endif   
                 break;
             case 3:  
                 #ifdef WIFI_3_SSID         
-                    result = connectWiFi(WIFI_3_SSID, WIFI_3_PASS, WIFI_3_CONF);
+                    result = connectWiFi(WIFI_3_SSID, WIFI_3_PASS, WIFI_3_CONF, WIFI_3_OPEN);
                 #endif   
                 break;
             case 4:  
                 #ifdef WIFI_4_SSID         
-                    result = connectWiFi(WIFI_4_SSID, WIFI_4_PASS, WIFI_4_CONF);
+                    result = connectWiFi(WIFI_4_SSID, WIFI_4_PASS, WIFI_4_CONF, WIFI_4_OPEN);
                 #endif   
                 break;
             case 5:  
                 #ifdef WIFI_5_SSID         
-                    result = connectWiFi(WIFI_5_SSID, WIFI_5_PASS, WIFI_5_CONF);
+                    result = connectWiFi(WIFI_5_SSID, WIFI_5_PASS, WIFI_5_CONF, WIFI_5_OPEN);
                 #endif   
                 break;
             case 6:  
                 #ifdef WIFI_6_SSID         
-                    result = connectWiFi(WIFI_6_SSID, WIFI_6_PASS, WIFI_6_CONF);
+                    result = connectWiFi(WIFI_6_SSID, WIFI_6_PASS, WIFI_6_CONF, WIFI_6_OPEN);
                 #endif   
                 break;
             case 7:  
                 #ifdef WIFI_7_SSID         
-                    result = connectWiFi(WIFI_7_SSID, WIFI_7_PASS, WIFI_7_CONF);
+                    result = connectWiFi(WIFI_7_SSID, WIFI_7_PASS, WIFI_7_CONF, WIFI_7_OPEN);
                 #endif   
                 break;
         }
@@ -213,7 +213,7 @@ int setupWiFi() {
 
 
 /* Utility Functions */
-int connectWiFi(char* ssid, char* pass, char* conf) {
+int connectWiFi(char* ssid, char* pass, char* conf, bool isOpen) {
     if (conf != "DHCP") {
         String address;
         
@@ -225,7 +225,10 @@ int connectWiFi(char* ssid, char* pass, char* conf) {
 
         WiFi.config(ipLocal, ipGateway, ipSubnet, ipDNS1, ipDNS2);
     }
-    WiFi.begin(ssid, pass);
+    if (isOpen)
+        WiFi.begin(ssid, NULL);
+    else    
+        WiFi.begin(ssid, pass);
 
     int attempt = 0;
     while (WiFi.status() != WL_CONNECTED && attempt < (WIFI_TIMEOUT * 1000) / WIFI_ATTEMPT_TIME) {        

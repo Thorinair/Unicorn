@@ -18,34 +18,42 @@
 #define WIFI_0_SSID "ExampleWiFiName"
 #define WIFI_0_PASS "password"
 #define WIFI_0_CONF "DHCP"
+#define WIFI_0_OPEN false
 
 #define WIFI_1_SSID "AnotherWiFi"
 #define WIFI_1_PASS "password"
 #define WIFI_1_CONF "192.168.0.201|192.168.0.1|255.255.255.0|8.8.8.8|8.8.4.4"
+#define WIFI_1_OPEN false
 
 //#define WIFI_2_SSID ""
 //#define WIFI_2_PASS ""
 //#define WIFI_2_CONF ""
+//#define WIFI_2_OPEN false
 
 //#define WIFI_3_SSID ""
 //#define WIFI_3_PASS ""
 //#define WIFI_3_CONF ""
+//#define WIFI_3_OPEN false
 
 //#define WIFI_4_SSID ""
 //#define WIFI_4_PASS ""
 //#define WIFI_4_CONF ""
+//#define WIFI_4_OPEN false
 
 //#define WIFI_5_SSID ""
 //#define WIFI_5_PASS ""
 //#define WIFI_5_CONF ""
+//#define WIFI_5_OPEN false
 
 //#define WIFI_6_SSID ""
 //#define WIFI_6_PASS ""
 //#define WIFI_6_CONF ""
+//#define WIFI_6_OPEN false
 
 //#define WIFI_7_SSID ""
 //#define WIFI_7_PASS ""
 //#define WIFI_7_CONF ""
+//#define WIFI_7_OPEN false
 
 /* WiFi Timeout, time in seconds until WiFi connection is cancelled if unavailable. */
 #define WIFI_TIMEOUT 10
@@ -110,7 +118,7 @@
 #define BATTERY_MULTIPLIER 5.622
  
 /* Battery voltage when empty. */
-#define BATTERY_V_MIN 3.2
+#define BATTERY_V_MIN 2.56
 
 /* Battery voltage when full. */
-#define BATTERY_V_MAX 4.2
+#define BATTERY_V_MAX 4.13
