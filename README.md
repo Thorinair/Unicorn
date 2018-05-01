@@ -14,6 +14,7 @@ Unicorn is an ESP8266 based high precision wireless thermometer and humidity met
 ## Libraries Used
 * [SHT21](https://github.com/markbeee/SHT21) by markbeee
 * [VariPass-for-ESP8266](https://github.com/Thorinair/VariPass-for-ESP8266) by Thorinair
+* [TwiFi](https://github.com/Thorinair/TwiFi) by Thorinair
 
 ## Electronics Used
 * [Croduino Nova](https://github.com/e-radionicacom/Croduino-NOVA-Eagle-Files) - An ESP8266 board designed and manufactured by [e-radionica.com](https://e-radionica.com/en/)
