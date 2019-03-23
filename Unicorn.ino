@@ -15,6 +15,7 @@
 #include "TwiFi.h"
 
 #include "Configuration.h"
+#include "ConfigurationVariPass.h"
 
 /* PIN Definitions */
 #define PIN_LED       13
