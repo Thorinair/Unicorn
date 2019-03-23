@@ -2,19 +2,6 @@
  * The main configuration file.
 */
 
-/********
- * VariPass Variables
- *******/
-
-/* VariPass account key. You can obtain this on the varipass.org website. */
-#define VARIPASS_KEY "apikey"
-
-/* VariPass variable IDs. To disable sending of a specific variable, comment it out. */
-#define VARIPASS_ID_TEMPERATURE "id1"
-#define VARIPASS_ID_HUMIDITY    "id2"
-#define VARIPASS_ID_BATTERY     "id3"
-
-
 
 /********
  * Intervals and optimization

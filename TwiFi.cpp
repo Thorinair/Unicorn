@@ -5,6 +5,12 @@
 
 #include "ConfigurationWiFi.h"
 
+/****** [ADD CODE] Include additional header files as needed. ******/
+
+
+
+/****** Stop including. ******/
+
 /* Default Settings */
 #define DEFAULT_WIFI 0
 
@@ -25,7 +31,11 @@ int attemptWiFiConnection(char* ssid, char* pass, char* conf, bool isOpen);
 int prevWiFi;
 int currWiFi;
 
+/****** [ADD CODE] Define custom external variables you might need. ******/
 
+
+
+/****** Stop adding. ******/
 
 /* Functions */
 String splitData(String data, char separator, int index) {
@@ -100,20 +110,35 @@ int attemptWiFiConnection(char* ssid, char* pass, char* conf, bool isOpen) {
             Serial.print(".");
         attempt++;
             
-        /*** Insert your code here to be executed while a connection is being attempted. ***/
+        /****** [ADD CODE] Insert the code to be executed while a connection is being attempted here. ******/
 
 
         
-        /*** Stop inserting. ***/
+        /****** Stop inserting. ******/
+
     }
     if (WiFi.status() == WL_CONNECTED) {
         if (WIFI_DEBUG)
             Serial.println("\nConnected to WiFi: '" + (String) ssid + "' With IP: " + WiFi.localIP()); 
+
+        /****** [ADD CODE] Insert the code to be executed when a connection is successful. You can use this for very specific cases to access internal variables. ******/
+
+
+
+        /****** Stop inserting. ******/
+
         return WIFI_RESULT_DONE;
     }
     else {
         if (WIFI_DEBUG)
             Serial.println("\nWiFi connection timed out."); 
+
+        /****** [ADD CODE] Insert the code to be executed when a connection fails. You can use this for very specific cases to access internal variables. ******/
+
+
+
+        /****** Stop inserting. ******/
+
         return WIFI_RESULT_FAIL;
     }
 }
@@ -175,7 +200,7 @@ int connectWiFi(bool repeatAttempts) {
                 break;
         }
         
-        if (counter >= 7 && !repeatAttempts)
+        if (result == WIFI_RESULT_FAIL && counter >= 7 && !repeatAttempts)
             return WIFI_RESULT_FAIL;
             
         if (result == WIFI_RESULT_FAIL) {
@@ -186,11 +211,12 @@ int connectWiFi(bool repeatAttempts) {
                 currWiFi = 0;
             counter++;
             
-            /*** Insert your code here for handling the failed attempts. ***/
+            /****** [ADD CODE] Insert the code for handling failed attempts here. ******/
 
 
             
-            /*** Stop inserting. ***/
+            /****** Stop inserting. ******/
+            
         }
     } while (result == WIFI_RESULT_FAIL);   
     if (WIFI_DEBUG)     
