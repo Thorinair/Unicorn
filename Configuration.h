@@ -14,6 +14,9 @@
 /* Measuring interval, also acts as deep sleep duration if enabled. Defined in seconds. */
 #define MEASURE_INTERVAL 120
 
+/* Enables serial output. */
+#define ENABLE_SERIAL false
+
 
 
 /********

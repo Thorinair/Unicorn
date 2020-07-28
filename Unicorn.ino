@@ -1,20 +1,10 @@
-/*
- * Unicorn
- *   Author:      Thorinair
- *   Version:     v1.4.0
- *   Description: A high precision wireless thermometer and humidity meter.
- *   
- *   This is the main source code file. All configuration is to be done inside the Configuration.h file.
-*/
-
-#include <EEPROM.h>
 #include <Wire.h>
 #include <SHT21.h>
+#include <TwiFi.h>
 #include <VariPass.h>
 
-#include "TwiFi.h"
-
 #include "Configuration.h"
+#include "ConfigurationWiFi.h"
 #include "ConfigurationVariPass.h"
 
 /* PIN Definitions */
@@ -41,11 +31,15 @@ void flashStatusLED(int type);
 /* Processing Functions */
 void processSensors();
 
+void connectAttempt(int idEntry, int attempt);
+void connectSuccess(int idEntry);
+void connectFail(int idEntry);
+
 
 
 /* Variables */
 SHT21 SHT21;
-int wifiConnected;
+bool wifiConnected;
 
 
 
@@ -90,7 +84,7 @@ void flashStatusLED(int type) {
 
 /* Processing Functions */
 void processSensors() {
-    if (wifiConnected == WIFI_RESULT_DONE) {    
+    if (wifiConnected) {
         int result;
     
         #ifdef VARIPASS_ID_TEMPERATURE    
@@ -141,15 +135,39 @@ void processSensors() {
 
 
 
-/* Standard Functions */
+void connectAttempt(int idEntry, int attempt) {
+
+}
+
+void connectSuccess(int idEntry) {
+
+}
+
+void connectFail(int idEntry) {
+
+}
+
 void setup() {
+    if (ENABLE_SERIAL)
+        Serial.begin(115200);
+
     setupLED();
     
     flashStatusLED(FLASH_TYPE_WAKE);
     
-    Serial.begin(9600);
     setupSensor();
-    wifiConnected = connectWiFi(false);
+
+    twifiInit(
+        wifis,
+        WIFI_COUNT,
+        WIFI_HOST,
+        WIFI_TIMEOUT,
+        &connectAttempt,
+        &connectSuccess,
+        &connectFail,
+        WIFI_DEBUG
+        );
+    wifiConnected = twifiConnect(false);
 
     processSensors();
     
